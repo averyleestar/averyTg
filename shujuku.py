@@ -1,12 +1,8 @@
 import MySQLdb
-def mysql_db():
-    # 连接数据库的参数
-    conn = pymysql.connect(
-            host="47.242.62.208", port='3309', database = "tgxe",
-                      charset= "utf8", user = "tgxe",  passwd= "55GBLMkwfNBdaRRm")
-# if __name__ == "__main__":
-#     mysql_db()
 
+# mysb = 'diyiban'
+#
+#
 # class conf():
 #     def con(config):
 #         if mysb == 'diyiban':
@@ -15,8 +11,8 @@ def mysql_db():
 #         else:
 #             config = {"host": "127.0.0.1", "port": 3309, "database": "tgxe",
 #                       "charset": "utf8", "user": "tgxe", "passwd": "55GBLMkwfNBdaRRm"}
+#
 #         return config
-
 
 class Database():
     # **config是指连接数据库时需要的参数,这样只要参数传入正确，连哪个数据库都可以
@@ -24,7 +20,7 @@ class Database():
     def __init__(self, **config):
         try:
             # 连接数据库的参数我不希望别人可以动，所以设置私有
-            self.__conn = pymysql.connect(**config)
+            self.__conn = MySQLdb.connect(**config)
             self.__cursor = self.__conn.cursor()
         except Exception as e:
             print("数据库连接失败：\n", e)
@@ -58,10 +54,10 @@ class Database():
         self.__cursor.execute(sql)
         return self.__cursor.fetchall()
 
-
-    def sql_all(self, sql):
-        self.__cursor.execute(sql)
-        return self.__cursor.fetchall()
+    #
+    # def sql_all(self, sql):
+    #     self.__cursor.execute(sql)
+    #     return self.__cursor.fetchall()
 
     # 新增数据
     def insert(self,table_name, key, value):

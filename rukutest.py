@@ -1,7 +1,7 @@
 import datetime
 import re
 
-from mysql import Database
+from shujuku import Database
 
 mysb = 'diyiban'
 
@@ -24,34 +24,46 @@ class sql2():
         try:
             # txt = message.json['text']
             txt1 = message.json['text'].split('\n')
-            Bill_Inf_dict = {}
-            Bill_other = ''
-            for i in txt1:
-                if i.find("入单") >= 0:
-                    pass
-                elif any(key in i for key in ["金额"]):
-                    amount = re.findall(r"\d+\.?\d*", i)[0]
-                elif i.find("客户") >= 0:
-                    Bill_Inf_dict['客户'] = i
-                elif i.find("支付方式") >= 0:
-                    Bill_Inf_dict['支付方式'] = i
-                elif i.find("代理") >= 0:
-                    Bill_Inf_dict['代理'] = i
-                else:
-                    Bill_other += i + '\n'
-            print('1111')
-            if all(k in Bill_Inf_dict.keys() for k in ['客户', '支付方式', '代理']) == True:
-                operation_ID = message.from_user.id
-                Bill_Inf = f"{Bill_Inf_dict['客户']}\n{Bill_Inf_dict['支付方式']}\n{Bill_Inf_dict['代理']}\n{Bill_other}入单时间:{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-                print(Bill_Inf)
-                chat_date = message.json['date']
-                print(type(chat_date),chat_date)
-                data = (operation_ID, chat_date, "", Bill_Inf,   amount)
-                print('data', data)
-                config = conf().con()
-                db = Database(**config)
-                db.insert(mysb, 'id,chat_date,chat_id,Bill_Info, amount',
-                          data)
+            amount = txt1[3].split('：')[1]
+            agent = txt1[4].split('：')[1]
+            paytype = txt1[2].split('：')[1]
+            customer = txt1[1].split('：')[1]
+            print(f"txt1 是,{txt1}")
+            # Bill_Inf_dict = {}
+            # Bill_other = ''
+            # for i in txt1:
+            #     if i.find("订单已确认") >= 0:
+            #         pass
+            #     elif any(key in i for key in ["金额"]):
+            #         amount = re.findall(r"\d+\.?\d*", i)[0]
+            #     elif any(key in i for key in ["客户"]):
+            #         customer = txt1[1].split('：')[1]
+            #     elif any(key in i for key in ["支付方式"]):
+            #         paytype = txt1[2].split('：')[1]
+            #     elif any(key in i for key in ["代理"]):
+            #         agent = txt1[4].split('：')[1]
+            #     elif i.find("支付方式") >= 0:
+            #         Bill_Inf_dict['客户'] = i
+            #     elif i.find("支付方式") >= 0:
+            #         Bill_Inf_dict['支付方式'] = i
+            #     elif i.find("代理") >= 0:
+            #         Bill_Inf_dict['代理'] = i
+            #     else:
+            #         Bill_other += i + '\n'
+            # print('1111')
+            # if all(k in Bill_Inf_dict.keys() for k in ['客户', '支付方式', '代理']) == True:
+            #     operation_ID = message.from_user.id
+            #     Bill_Inf = f"{Bill_Inf_dict['客户']}\n{Bill_Inf_dict['支付方式']}\n{Bill_Inf_dict['代理']}\n{Bill_other}入单时间:{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            #     print(Bill_Inf)
+            operation_ID = message.from_user.id
+            chat_date = message.json['date']
+            # print(type(chat_date), chat_date)
+            data = (operation_ID, chat_date, "", message.json['text'] , amount, customer, paytype, agent)
+            print('data', data)
+            config = conf().con()
+            db = Database(**config)
+            db.insert(mysb, 'id,chat_date,chat_id,Bill_Info, amount,customer,paytype,agent',
+                      data)
                 # Bill_In = sql2.Bill_Info(chat_date)
                 # if Bill_In != None:
                 #     return Bill_In

@@ -17,7 +17,6 @@ class mkey():
         keyboard_inline_2 = types.InlineKeyboardMarkup().add(button5, button6, button7, button0)
         return keyboard_inline_2
 
-
     def keyboard_inline_3(self):
         button0 = types.InlineKeyboardButton(text="菜单", callback_data="菜单")
         button8 = types.InlineKeyboardButton(text="白富美", callback_data="白富美")
@@ -27,6 +26,22 @@ class mkey():
         keyboard_inline_3 = types.InlineKeyboardMarkup().add(button8, button9, button10, button11, button0)
         return keyboard_inline_3
 
+    def keyboard_inline_4(chat_id):
+        button0 = types.InlineKeyboardButton(text="菜单", callback_data="菜单")
+        button12 = types.InlineKeyboardButton(text="确认", callback_data=f"确认,{chat_id}")
+        button13 = types.InlineKeyboardButton(text="修改", callback_data=f"修改,{chat_id}")
+        button14 = types.InlineKeyboardButton(text="取消", callback_data=f"取消,{chat_id}")
+        keyboard_inline_4 = types.InlineKeyboardMarkup().add(button12, button13, button14, button0)
+        return keyboard_inline_4
+
+    def keyboard_inline_5(chat_id):
+        button0 = types.InlineKeyboardButton(text="菜单", callback_data="菜单")
+        keyboard_inline_5 = types.InlineKeyboardMarkup().add(button0)
+        return keyboard_inline_5
 
 
+class daili():
+    def agency(self):
+        agent_id = {"高富帅": "-989436172", "白富美": "-4478516458968", "老阿姨": "-41247458968", "怪叔叔": "-4124568"}
+        return agent_id
 

@@ -1,8 +1,10 @@
 import telebot
-
 from button import mkey
+from button import daili
 from PC import ox
-from avery.billtest_py import sql2
+from rukutest import sql2
+
+# from avery.billtest_py import sql2
 
 bot = telebot.TeleBot('6030350843:AAHeqsmEbTbaqNBZOKlqCejwuS1FR7KLQyg')  # ,1500
 # bot = AsyncTeleBot('6085539958:AAFmcobXOYV3AuRJlzlnT51-kkAIrm1UWuE')
@@ -23,54 +25,33 @@ def handle_message(message):
     if str(message.text[:2]) in ['开始']:
         # rtext = sql.Bill_Into(message)
         # print(rtext)
-        #
-        # button1 = types.InlineKeyboardButton(text="今日汇率", callback_data="hl")
-        # button2 = types.InlineKeyboardButton(text="支持方式", callback_data="fs")
-        # # button3 = types.InlineKeyboardButton(text="代理", callback_data="dl")
-        # keyboard_inline = types.InlineKeyboardMarkup().add(button1, button2)
-
         chat_date = message.date
         bot.send_message(chat_id=message.chat.id,
                          text="你好有什么可以帮到您",
                          reply_markup=mkey.keyboard_inline(1),
                          parse_mode='HTML')
 
-
 @bot.callback_query_handler(func=lambda call: True)
 def handle_query(call):
     # print(call.data)
-    if call.data == 'hl':
-        bot.send_message(call.message.chat.id, ox(),
-                         parse_mode='markdown')
-
-        # if call.data == '菜单':
-        #     button1 = types.InlineKeyboardButton(text="今日汇率", callback_data="hl")
-        #     button2 = types.InlineKeyboardButton(text="支持方式", callback_data="fs")
-        #     # button3 = types.InlineKeyboardButton(text="代理", callback_data="dl")
-        #     keyboard_inline = types.InlineKeyboardMarkup().add(button1, button2)
+    if call.data == "菜单":
         bot.send_message(chat_id=call.message.chat.id,
                          text="你好有什么可以帮到您",
                          reply_markup=mkey.keyboard_inline(1),
                          parse_mode='HTML')
 
+    if call.data == 'hl':
+        bot.send_message(call.message.chat.id, ox(),
+                         parse_mode='markdown')
+
+
     if call.data == 'fs':
-        # button0 = types.InlineKeyboardButton(text="菜单", callback_data="菜单")
-        # button5 = types.InlineKeyboardButton(text="银行卡", callback_data="银行卡")
-        # button6 = types.InlineKeyboardButton(text="支付宝", callback_data="支付宝")
-        # button7 = types.InlineKeyboardButton(text="现金", callback_data="现金")
-        # keyboard_inline_2 = types.InlineKeyboardMarkup().add(button5, button6, button7, button0)
         bot.send_message(chat_id=call.message.chat.id,
                          text="请选择您的支付方式",
                          reply_markup=mkey.keyboard_inline_2(1),
                          parse_mode='HTML')
 
     if call.data == '银行卡':
-        # button0 = types.InlineKeyboardButton(text="菜单", callback_data="菜单")
-        # button8 = types.InlineKeyboardButton(text="白富美", callback_data="白富美")
-        # button9 = types.InlineKeyboardButton(text="老阿姨", callback_data="老阿姨")
-        # button10 = types.InlineKeyboardButton(text="怪叔叔", callback_data="怪叔叔")
-        # button11 = types.InlineKeyboardButton(text="高富帅", callback_data="高富帅")
-        # keyboard_inline_3 = types.InlineKeyboardMarkup().add(button8, button9, button10, button11,button0)
         bot.send_message(chat_id=call.message.chat.id,
                          text=f"您已选择银行卡支付方式,请选择交易代理",
                          reply_markup=mkey.keyboard_inline_3(1),
@@ -78,12 +59,6 @@ def handle_query(call):
         # bot.register_next_step_handler(call.message, next_step_edit_auth, '银行卡', call.message.json['text'] , call.message.chat.username)
 
     if call.data == '支付宝':
-        # button0 = types.InlineKeyboardButton(text="菜单", callback_data="菜单")
-        # button8 = types.InlineKeyboardButton(text="白富美", callback_data="白富美")
-        # button9 = types.InlineKeyboardButton(text="老阿姨", callback_data="老阿姨")
-        # button10 = types.InlineKeyboardButton(text="怪叔叔", callback_data="怪叔叔")
-        # button11 = types.InlineKeyboardButton(text="高富帅", callback_data="高富帅")
-        # keyboard_inline_3 = types.InlineKeyboardMarkup().add(button8, button9, button10, button11,button0)
         bot.send_message(chat_id=call.message.chat.id,
                          text=f"您已选择支付宝支付方式,请选择交易代理",
                          reply_markup=mkey.keyboard_inline_3(1),
@@ -139,22 +114,56 @@ def handle_query(call):
         bot.send_message(call.message.chat.id, f"您已选择怪叔叔代理交易,请输入交易金额和币种", parse_mode='markdown')
         bot.register_next_step_handler(call.message, next_step_edit_auth, '怪叔叔', output, agent_id)
 
+    if call.data[:2] == '确认':
+        key = call.message.json['text']
+        chat_id = call.message.chat.id
+        message_id = call.message.message_id
+        # print(type(key))
+        messages = key.split('\n')
+        if len(messages) >= 3:
+            agent_name = messages[3].split('：')[1]
+            # print(messages)
+            # print(key)
+            agent_id = daili.agency(1)[agent_name]
+            # print(agent_id)
+            forwardmess = f"确认\n{key}"
+            bot.edit_message_text(f"已确认\n{key}", chat_id, message_id)
+            bot.edit_message_reply_markup(chat_id, message_id,  reply_markup=mkey.keyboard_inline_5(chat_id))
+            yy = bot.send_message(agent_id, f"订单已确认：\n{key}", parse_mode='markdown')
+
+            if yy.json['text'][:5] == '订单已确认':
+                rtext = sql2.Bill_Into(yy)
+                print(f"总的来说是这样的：,{rtext}")
+
+    if call.data[:2] == '修改':
+        key = call.message.json['text']
+        chat_id = call.message.chat.id
+        message_id = call.message.message_id
+        # bot.send_message(chat_id, f"您想修改交易信息，请按照以下模板输入新信息:\n修改\n客户:(您的telegram账号)\n支付方式:(请输入银行卡/支付宝/现金)\n交易金额:(请输入交易金额)\n代理:(请输入交易代理)", parse_mode='markdown')
+        bot.edit_message_text(f"您想修改交易信息\n{key}\n请点击[菜单]按钮重新选择交易信息", chat_id, message_id)
+        bot.edit_message_reply_markup(chat_id, message_id, reply_markup=mkey.keyboard_inline_5(chat_id))
+
+    if call.data[:2] == '取消':
+        key = call.message.json['text']
+        chat_id = call.message.chat.id
+        message_id = call.message.message_id
+        # bot.send_message(chat_id, f"您想修改交易信息，请按照以下模板输入新信息:\n修改\n客户:(您的telegram账号)\n支付方式:(请输入银行卡/支付宝/现金)\n交易金额:(请输入交易金额)\n代理:(请输入交易代理)", parse_mode='markdown')
+        bot.edit_message_text(f"您想取消以下交易\n{key}\n若想继续交易,请点击[菜单]按钮重新选择交易信息", chat_id, message_id)
+        bot.edit_message_reply_markup(chat_id, message_id, reply_markup=mkey.keyboard_inline_5(chat_id))
+
 
 def next_step_edit_auth(message, agent, output, agent_id):
-    xx=bot.send_message(message.chat.id,
-                     f"客户：{message.chat.username}\n 支付方式： {output}\n 交易金额：{message.json['text']}\n 代理：{agent} ",
+    chat_id = message.message_id
+    xx = bot.send_message(chat_id=message.chat.id,
+                     text= f"客户：{message.chat.username}\n支付方式： {output}\n交易金额：{message.json['text']}\n代理：{agent} ",
+                     reply_markup=mkey.keyboard_inline_4(chat_id),
                      parse_mode='markdown')
-    xx=bot.send_message(qun_id2,
-                     f"客户：{message.chat.username}\n支付方式： {output}\n交易金额：{message.json['text']}\n代理：{agent} ",
-                     parse_mode='markdown')
-    xx=bot.send_message(agent_id,
-                     f"客户：{message.chat.username}\n支付方式： {output}\n交易金额：{message.json['text']}\n代理：{agent} ",
-                     parse_mode='markdown')
-    print(xx.json['text'] )
-    if xx.json['text'][:2] in ['客户']:
-        rtext = sql2.Bill_Into(xx)
-        print(rtext)
 
+
+
+
+
+bot.infinity_polling()
 # message.json['text']
 #
 #         qchat_id = bot_message.chat.id
@@ -247,7 +256,7 @@ def next_step_edit_auth(message, agent, output, agent_id):
 # #     print(message)
 #
 
-bot.infinity_polling()
+
 # asyncio.run(bot.polling())
 
 # @bot.message_handler(regexp="Play")
