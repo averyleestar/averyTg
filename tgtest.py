@@ -51,6 +51,16 @@ def handle_query(call):
                          reply_markup=mkey.keyboard_inline_2(1),
                          parse_mode='HTML')
 
+    if call.data[:4] == 'jyjl':
+        key = call.message.chat.username
+        # user_id = call.message.user_id
+        # message_id = call.message.message_id
+        # print(type(key))
+        # messages = key.split('\n')
+        rtext = sql2.Bill_Info_All(key)
+        print(f"叫出来的数据是：,{rtext}")
+
+
     if call.data == '银行卡':
         bot.send_message(chat_id=call.message.chat.id,
                          text=f"您已选择银行卡支付方式,请选择交易代理",

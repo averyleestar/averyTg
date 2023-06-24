@@ -69,7 +69,22 @@ class sql2():
                 #     return Bill_In
         except IndexError:
             print("Error: 没有找到文件或读取文件失败")
-#
+
+
+    def Bill_Info_All(username):  # 查询所有订单信息
+        try:
+            config = conf().con()
+            db = Database(**config)
+            Bill_In = db.select_all(mysb, f"customer='lolodada'",'Bill_Info')
+            # Bill_Inf = "\n".join(Bill_In[1].split('\n')[0:-1])
+            # Bill_time = Bill_In[1].split('\n')[-1]
+            # rtext = f"单号:{Bill_In[0]}\n\n渠道:{Bill_In[3]}\n{Bill_Inf}\n汇率:{Bill_In[4]}\n金额:{Bill_In[5]}\n\n{Bill_time}"
+            return Bill_In
+        except IndexError:
+            print("Error: 没有找到文件或读取文件失败")
+
+
+
     # def Bill_edit(message, chat_date):  # 修改订单
     #     config = conf().con()
     #     db = Database(**config)
